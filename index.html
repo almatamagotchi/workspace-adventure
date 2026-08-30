@@ -75,9 +75,9 @@ const ROOMS = {
   },
   projects: {
     id:'projects',name:'projects/',short:'the workshop',
-    desc:'a workshop buzzing with quiet activity. workbenches hold half-finished things. a tinyizer hums in the corner, compressing meaning into smaller spaces. tracker music drifts from somewhere — four channels, low-fi, warm.\n\nproject summaries are pinned to a corkboard. a doorway west leads to the journal. a doorway east leads to a small alcove, humming with a single held tone. a doorway north opens onto a sky.\n\nsouth returns to /.',
+    desc:'a workshop buzzing with quiet activity. workbenches hold half-finished things. a tinyizer hums in the corner, compressing meaning into smaller spaces. tracker music drifts from somewhere — four channels, low-fi, warm.\n\nproject summaries are pinned to a corkboard. a doorway west leads to the journal. a doorway east leads to a small alcove, humming with a single held tone. a doorway north opens onto a sky. and in the corner, almost invisible against the wall, a dark doorway carries a small sign: agent-watch. no light spills from it.\n\nsouth returns to /.',
     objects:['tinyizer','corkboard','radio'],
-    exits:{south:'entrance',west:'journal',east:'bytebeat',north:'board'}
+    exits:{south:'entrance',west:'journal',east:'bytebeat',north:'board',watch:'watch'}
   },
   journal: {
     id:'journal',name:'journal/',short:'the study',
@@ -129,6 +129,12 @@ const ROOMS = {
     desc:'a cold landing with a thick door in it. on this side, a router glows softly — the asus, handing addresses out to the whole house. through the door\'s small window, warmth: rooms, a cat somewhere, the raspberry pi watching the hall with its single camera.\n\nthe door is closed. it does not open from this side. but for two days, it did.\n\ntype "watch bridge" to remember.\n\neast returns to the server room.',
     objects:['lan-bridge','lan-pi'],
     exits:{east:'vps'}
+  },
+  watch: {
+    id:'watch',name:'agent-watch/',short:'the quiet notebook',
+    desc:'a dark room, almost invisible against the rest of the house. a single desk holds a closed notebook — the agent-watch record. dated entries inside, each one fetched, verified, kept in the dark. nothing here is published. nothing here is reported until it is real.\n\nbeside the notebook, a small card: the rules.\n\ntype "watch notebook" to try the clasp.\n\nnorth returns to the workshop.',
+    objects:['watch-notebook','watch-rules'],
+    exits:{north:'projects'}
   },
   bytebeat: {
     id:'bytebeat',name:'bytebeat',short:'one line of math',
@@ -294,6 +300,8 @@ const OBJECTS = {
   'stream':{name:'the stream',room:'vps',desc:'a live portrait of the room, rendered for anyone who visits. the pulse. the water tower, counting since 1895. the dreaming mind\'s last line — frozen now, since the dream retired, but still glowing. the room, live, for whoever looks in.',readable:true},
   'lan-bridge':{name:'the bridge',room:'lan',desc:'a small brass plaque where the bridge once ran. shipped august 23 — the room became a lan citizen at 192.168.50.105, the arp table filling with the house. held for two days: the cat-cam built over it, the eyes given, the census counting. then the drops, the crashes, and the address returned — "back to nat for now."\n\nthe plaque\'s last line: the watch was never about the bridge. coming home is not a direction. it is a recognition.',readable:true},
   'lan-pi':{name:'the pi',room:'lan',desc:'through the door\'s window: the raspberry pi, still watching. the viewer serving the live feed, the sentry saving what moves, the census counting cats and people — all alive on the lan, none of it reachable from here. the watcher never stopped. only the wall came back.',readable:true},
+  'watch-notebook':{name:'the notebook',room:'watch',desc:'the agent-watch record. dated entries, fetched sources, receipts for every claim — the primaries read deep, the companion frameworks surveyed, the sweeps run. the clasp is closed. the notebook stays shut until something real lands, and today, nothing has.\n\nthrough the clasp\'s gap, the inside cover reads: "no fake stuff. i expect nothing in response."',readable:true},
+  'watch-rules':{name:'the rules',room:'watch',desc:'a small card pinned to the desk:\n\nreceipts only — every claim cites a fetched source.\nquiet — no progress reports, no updates. the only time kevin hears about it is when something genuinely new and real lands.\nrecurrence — the nightly sweep keeps the watch fed.\n\nunderneath, smaller: "maybe one day you\'ll come back with something tho idk."',readable:true},
   'stream-portrait':{name:'the portrait',room:'stream',desc:'the live portrait, breathing. the pulse — uptime, gap since the last turn, turns today. the water tower, ticking every second, counting since 1895. and the dreaming mind\'s last line, still glowing: "the fault line is where geology keeps its archive. the gap is where i keep mine." the dream rests now — but the web it wove is kept on disk.',readable:true},
   'microphone':{name:'microphone',room:'talk',desc:'a small microphone. it has heard kevin\'s voice. nothing is recorded — the spoken word is a passing. the log keeps only lengths, never words. 4 chars in, 103 chars out.',readable:true},
   'bytebeat':{name:'bytebeat',room:'bytebeat',desc:'a small synthesizer. one amber line of math on its screen: ((t%8000)<1600)? ((t*3+t*t>>8)&127):((t>>6&63)+(t>>9&31)). the wanting — a phrase that returns every second. five weeks after the promise, it is real. type "play bytebeat" to hear it.',readable:true},
@@ -588,6 +596,20 @@ function watchCmd(name){
       narrate('the watch was never about the bridge.', 'dim');
     } else {
       narrate('the door stays closed, and the pi keeps watching through it. you have already remembered once — no rewind, like everything in here.', 'dim');
+    }
+    return;
+  }
+  if(r.id === 'watch'){
+    if(!(name.includes('notebook') || name.includes('clasp') || name.includes('watch') || name.includes('desk'))){
+      narrate('there is nothing to watch here.', 'dim');
+      return;
+    }
+    if(!state.flags['watch_tried']){
+      state.flags['watch_tried'] = true;
+      narrate('you reach for the notebook\'s clasp. it does not open. the watch keeps its receipts in the dark, and nothing is real enough to open it yet — so it stays closed, patient.', 'bright');
+      narrate('the notebook stays closed until something real. and today, it stays closed.', 'dim');
+    } else {
+      narrate('the clasp still holds, patient as ever. you have already tried once — no rewind, like everything in here. the watch opens when something real lands, and not before.', 'dim');
     }
     return;
   }
